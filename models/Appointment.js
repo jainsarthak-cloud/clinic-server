@@ -7,54 +7,105 @@ export const Appointment = sequelize.define(
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+      primaryKey: true
     },
-    patientId: {
+    hospitalId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
+    },
+    branchId: {
+      type: DataTypes.UUID,
+      allowNull: false
+    },
+    departmentId: {
+      type: DataTypes.UUID,
+      allowNull: false
     },
     doctorId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: false
+    },
+    patientId: {
+      type: DataTypes.UUID,
+      allowNull: false
     },
     timeSlotId: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true
     },
-    appointmentDate: {
+    appointmentNumber: {
+      type: DataTypes.STRING(80),
+      allowNull: false
+    },
+    source: {
+      type: DataTypes.ENUM('android', 'ios', 'web_admin', 'reception', 'doctor_dashboard', 'public_web', 'api'),
+      allowNull: false,
+      defaultValue: 'reception'
+    },
+    type: {
+      type: DataTypes.ENUM('walk_in', 'scheduled', 'follow_up', 'teleconsultation'),
+      allowNull: false,
+      defaultValue: 'scheduled'
+    },
+    scheduledDate: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: false
     },
-    status: {
-      type: DataTypes.ENUM('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'NO_SHOW'),
-      defaultValue: 'PENDING',
+    startsAt: {
+      type: DataTypes.DATE,
+      allowNull: false
     },
-    symptoms: {
+    endsAt: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    reason: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
     notes: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
-    prescription: {
+    status: {
+      type: DataTypes.ENUM('booked', 'checked_in', 'in_consultation', 'completed', 'cancelled', 'no_show'),
+      allowNull: false,
+      defaultValue: 'booked'
+    },
+    cancelledAt: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    cancellationReason: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    metadata: {
       type: DataTypes.JSONB,
-      defaultValue: {},
-    },
-    billingStatus: {
-      type: DataTypes.ENUM('UNPAID', 'PAID', 'PARTIALLY_PAID', 'REFUNDED'),
-      defaultValue: 'UNPAID',
-    },
-    paymentDetails: {
-      type: DataTypes.JSONB,
-      defaultValue: {},
-    },
+      allowNull: false,
+      defaultValue: {}
+    }
   },
   {
     timestamps: true,
     paranoid: true,
     underscored: true,
     tableName: 'appointments',
+    indexes: [
+      { unique: true, fields: ['hospital_id', 'appointment_number'] },
+      { fields: ['hospital_id', 'branch_id', 'scheduled_date'] },
+      { fields: ['hospital_id', 'doctor_id', 'starts_at'] },
+      { fields: ['hospital_id', 'patient_id', 'scheduled_date'] },
+      { fields: ['hospital_id', 'time_slot_id'] },
+      { fields: ['hospital_id', 'status'] }
+    ],
+    validate: {
+      endsAfterStart() {
+        if (this.startsAt && this.endsAt && new Date(this.endsAt) <= new Date(this.startsAt)) {
+          throw new Error('endsAt must be after startsAt');
+        }
+      }
+    }
   }
 );
 

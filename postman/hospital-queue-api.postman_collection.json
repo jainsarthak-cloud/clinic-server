@@ -1,0 +1,372 @@
+{
+  "info": {
+    "_postman_id": "4cc8d801-2f0f-4657-8f20-hospital-queue",
+    "name": "Hospital Queue API",
+    "description": "Postman collection for Hospital Queue users, time slots, and appointments.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/../health",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["..", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.token) pm.environment.set('token', json.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@demo-hospital.test\",\n  \"password\": \"ChangeMe123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseApiUrl}}/users/login",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["users", "login"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/users/logout",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["users", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Create Hospital User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.id) pm.environment.set('userId', json.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Reception Demo\",\n  \"email\": \"reception.demo@example.com\",\n  \"phone\": \"+910000000002\",\n  \"password\": \"Password123!\",\n  \"role\": \"receptionist\",\n  \"status\": \"active\",\n  \"membershipStatus\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/users",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "users"]
+            }
+          }
+        },
+        {
+          "name": "List Hospital Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/users?page=1&limit=20",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/users/{{userId}}",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Reception Demo Updated\",\n  \"phone\": \"+910000000003\"\n}"
+            },
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/users/{{userId}}",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update User Status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/users/{{userId}}/status",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "users", "{{userId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Time Slots",
+      "item": [
+        {
+          "name": "Create Time Slot",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.id) pm.environment.set('timeSlotId', json.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchId\": \"{{branchId}}\",\n  \"departmentId\": \"{{departmentId}}\",\n  \"doctorId\": \"{{doctorId}}\",\n  \"date\": \"2026-07-08\",\n  \"startTime\": \"10:00:00\",\n  \"endTime\": \"10:15:00\",\n  \"slotType\": \"consultation\",\n  \"maxAppointments\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/time-slots",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "time-slots"]
+            }
+          }
+        },
+        {
+          "name": "List Time Slots",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/time-slots?date=2026-07-08",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "time-slots"],
+              "query": [{ "key": "date", "value": "2026-07-08" }]
+            }
+          }
+        },
+        {
+          "name": "Available Time Slots",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/time-slots/available?doctorId={{doctorId}}&date=2026-07-08",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "time-slots", "available"],
+              "query": [
+                { "key": "doctorId", "value": "{{doctorId}}" },
+                { "key": "date", "value": "2026-07-08" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Block Time Slot",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Doctor unavailable\"\n}"
+            },
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/time-slots/{{timeSlotId}}/block",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "time-slots", "{{timeSlotId}}", "block"]
+            }
+          }
+        },
+        {
+          "name": "Unblock Time Slot",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/time-slots/{{timeSlotId}}/unblock",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "time-slots", "{{timeSlotId}}", "unblock"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Appointments",
+      "item": [
+        {
+          "name": "Create Appointment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json?.data?.id) pm.environment.set('appointmentId', json.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchId\": \"{{branchId}}\",\n  \"departmentId\": \"{{departmentId}}\",\n  \"doctorId\": \"{{doctorId}}\",\n  \"patientId\": \"{{patientId}}\",\n  \"timeSlotId\": \"{{timeSlotId}}\",\n  \"appointmentNumber\": \"APT-{{$timestamp}}\",\n  \"source\": \"reception\",\n  \"type\": \"scheduled\",\n  \"scheduledDate\": \"2026-07-08\",\n  \"startsAt\": \"2026-07-08T10:00:00.000Z\",\n  \"endsAt\": \"2026-07-08T10:15:00.000Z\",\n  \"reason\": \"General consultation\"\n}"
+            },
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/appointments",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "appointments"]
+            }
+          }
+        },
+        {
+          "name": "List Appointments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/appointments?scheduledDate=2026-07-08",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "appointments"],
+              "query": [{ "key": "scheduledDate", "value": "2026-07-08" }]
+            }
+          }
+        },
+        {
+          "name": "Get Appointment By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/appointments/{{appointmentId}}",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "appointments", "{{appointmentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Check In Appointment",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/appointments/{{appointmentId}}/check-in",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "appointments", "{{appointmentId}}", "check-in"]
+            }
+          }
+        },
+        {
+          "name": "Complete Appointment",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/appointments/{{appointmentId}}/complete",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "appointments", "{{appointmentId}}", "complete"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Appointment",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Patient requested cancellation\"\n}"
+            },
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/appointments/{{appointmentId}}/cancel",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "appointments", "{{appointmentId}}", "cancel"]
+            }
+          }
+        },
+        {
+          "name": "Appointment Status Counts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseApiUrl}}/hospitals/{{hospitalId}}/appointments/status-counts?scheduledDate=2026-07-08",
+              "host": ["{{baseApiUrl}}"],
+              "path": ["hospitals", "{{hospitalId}}", "appointments", "status-counts"],
+              "query": [{ "key": "scheduledDate", "value": "2026-07-08" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -14,6 +14,10 @@ export const Doctor = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    hospitalId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
     specialization: {
       type: DataTypes.STRING(150),
       allowNull: false,
@@ -49,6 +53,15 @@ export const Doctor = sequelize.define(
     paranoid: true,
     underscored: true,
     tableName: 'doctors',
+    indexes: [
+      {
+        unique: true,
+        fields: ['hospital_id', 'user_id'],
+      },
+      {
+        fields: ['hospital_id'],
+      },
+    ],
   }
 );
 

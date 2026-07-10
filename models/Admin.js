@@ -14,6 +14,10 @@ export const Admin = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    hospitalId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
     permissions: {
       type: DataTypes.JSONB,
       defaultValue: [],
@@ -24,6 +28,15 @@ export const Admin = sequelize.define(
     paranoid: true,
     underscored: true,
     tableName: 'admins',
+    indexes: [
+      {
+        unique: true,
+        fields: ['hospital_id', 'user_id'],
+      },
+      {
+        fields: ['hospital_id'],
+      },
+    ],
   }
 );
 

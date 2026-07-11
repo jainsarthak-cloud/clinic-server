@@ -119,7 +119,13 @@ class AppointmentService {
         startsAt: payload.startsAt || appointment.startsAt,
         endsAt: payload.endsAt || appointment.endsAt
       };
-      this.ensureDateRange(next.startsAt, next.endsAt);
+      if (next.timeSlotId) {
+  const timeSlot = await timeSlotRepo.findById(next.timeSlotId, hospitalId, { transaction });
+  if (!timeSlot) throw new Error('Time slot not found');
+  if (timeSlot.doctorId !== next.doctorId) throw new Error('Time slot doctor does not match appointment doctor');
+  if (timeSlot.date !== next.scheduledDate) throw new Error('Time slot date does not match appointment date');
+}
+this.ensureDateRange(next.startsAt, next.endsAt);
       await this.validateReferences(hospitalId, next, { transaction });
       await this.ensureDoctorIsFree(next.doctorId, hospitalId, next.startsAt, next.endsAt, appointmentId, { transaction });
 
